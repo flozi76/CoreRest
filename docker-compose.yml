@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  corerest:
-    image: ${DOCKER_REGISTRY}corerest
-    build:
-      context: .
-      dockerfile: CoreRest/Dockerfile
