@@ -1,19 +1,16 @@
-FROM microsoft/aspnetcore:2.0 AS base
+FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
-EXPOSE 8080
 
-FROM microsoft/aspnetcore-build:2.0 AS build
-WORKDIR /src
-COPY CoreRest/CoreRest.csproj CoreRest/
-RUN dotnet restore CoreRest/CoreRest.csproj
-COPY . .
-WORKDIR /src/CoreRest
-RUN dotnet build CoreRest.csproj -c Release -o /app
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish CoreRest.csproj -c Release -o /app
+# Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+# Build runtime image
+FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
-COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "CoreRest.dll"]
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet", "aspnetapp.dll"]
