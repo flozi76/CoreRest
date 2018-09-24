@@ -8,6 +8,7 @@ RUN dotnet restore
 # copy everything else and build
 COPY . ./
 RUN dotnet publish -c Release -o out
+EXPOSE 8085
 
 # build runtime image
 FROM microsoft/aspnetcore:2.0
